@@ -1,10 +1,10 @@
 import numpy as np
 import pywt as pywt
 from scipy import signal
-from sklearn.preprocessing import FunctionTransformer
+from sklearn.base import BaseEstimator,TransformerMixin
 
 
-class SpectrogramTransformer(FunctionTransformer):
+class SpectrogramTransformer(BaseEstimator,TransformerMixin):
 
     def __init__(self, fft_length, stride_length, sample_rate, window="hanning", axis=0,
                  kw_args=None, inv_kw_args=None):
@@ -17,7 +17,12 @@ class SpectrogramTransformer(FunctionTransformer):
         self.stride_length = stride_length
         self.window = window
         self.axis = axis
-        super().__init__(self.f, inverse_func, validate, accept_sparse, pass_y, kw_args, inv_kw_args)
+
+    def fit(self, x, y=None):
+        return self
+    
+    def transform(self, x):
+        return self.f(x)
 
     def f(self, X):
         return self.to_spectrogram(X)
@@ -30,7 +35,7 @@ class SpectrogramTransformer(FunctionTransformer):
         return Sxx.transpose()
 
 
-class WaeveletTransformer(FunctionTransformer):
+class WaeveletTransformer(BaseEstimator,TransformerMixin):
     def __init__(self, wavelet_width, wavelet='mexh',
                  kw_args=None, inv_kw_args=None):
         validate = False
@@ -39,7 +44,12 @@ class WaeveletTransformer(FunctionTransformer):
         pass_y = 'deprecated'
         self.wavelet_width = wavelet_width
         self.wavelet = wavelet
-        super().__init__(self.f, inverse_func, validate, accept_sparse, pass_y, kw_args, inv_kw_args)
+
+    def fit(self, x, y=None):
+        return self
+    
+    def transform(self, x):
+        return self.f(x)
 
     def f(self, X):
         # TODO which is better? scipy.signal or pywt
