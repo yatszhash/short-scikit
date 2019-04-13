@@ -22,13 +22,7 @@ class SpectrogramTransformer(BaseEstimator,TransformerMixin):
         return self
     
     def transform(self, x):
-        return self.f(x)
-
-    def f(self, X):
-        return self.to_spectrogram(X)
-
-    def to_spectrogram(self, series):
-        f, t, Sxx = signal.spectrogram(series, fs=self.sample_rate, nperseg=self.fft_length,
+        f, t, Sxx = signal.spectrogram(x, fs=self.sample_rate, nperseg=self.fft_length,
                                        noverlap=self.fft_length - self.stride_length, window=self.window,
                                        axis=self.axis,
                                        return_onesided=True, mode="magnitude", scaling="density")
@@ -49,10 +43,7 @@ class WaeveletTransformer(BaseEstimator,TransformerMixin):
         return self
     
     def transform(self, x):
-        return self.f(x)
-
-    def f(self, X):
         # TODO which is better? scipy.signal or pywt
         # wavelets = signal.cwt(X, signal.ricker, np.arange(1, self.wavelet_width + 1))
-        wavelets, _ = pywt.cwt(X, np.arange(1, self.wavelet_width + 1), self.wavelet)
+        wavelets, _ = pywt.cwt(x, np.arange(1, self.wavelet_width + 1), self.wavelet)
         return wavelets
