@@ -5,24 +5,20 @@ from sklearn.base import BaseEstimator,TransformerMixin
 
 
 class SpectrogramTransformer(BaseEstimator,TransformerMixin):
-
     def __init__(self, fft_length, stride_length, sample_rate, window="hanning", axis=0,
                  kw_args=None, inv_kw_args=None):
-        validate = False
-        inverse_func = None
-        accept_sparse = False
-        pass_y = 'deprecated'
         self.sample_rate = sample_rate
         self.fft_length = fft_length
         self.stride_length = stride_length
         self.window = window
         self.axis = axis
+        super().__init__()
 
     def fit(self, x, y=None):
         return self
     
     def transform(self, x):
-        f, t, Sxx = signal.spectrogram(x, fs=self.sample_rate, nperseg=self.fft_length,
+        _, _, Sxx = signal.spectrogram(x, fs=self.sample_rate, nperseg=self.fft_length,
                                        noverlap=self.fft_length - self.stride_length, window=self.window,
                                        axis=self.axis,
                                        return_onesided=True, mode="magnitude", scaling="density")
@@ -32,12 +28,9 @@ class SpectrogramTransformer(BaseEstimator,TransformerMixin):
 class WaeveletTransformer(BaseEstimator,TransformerMixin):
     def __init__(self, wavelet_width, wavelet='mexh',
                  kw_args=None, inv_kw_args=None):
-        validate = False
-        inverse_func = None
-        accept_sparse = False
-        pass_y = 'deprecated'
         self.wavelet_width = wavelet_width
         self.wavelet = wavelet
+        super().__init__()
 
     def fit(self, x, y=None):
         return self

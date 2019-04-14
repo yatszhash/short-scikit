@@ -27,15 +27,15 @@ with such.A('sample test') as it:
         spectrogram_transformer = SpectrogramTransformer(fft_length, stride_length, fs, window="hanning", axis=0)
 
         @it.should('SpectrogramTransformer fit method')
-        def test1(case):
+        def spectrogram_test1(case):
             it.assertIsInstance(spectrogram_transformer.fit(x), SpectrogramTransformer)
 
         @it.should('SpectrogramTransformer transform method')
-        def test2(case):
+        def spectrogram_test2(case):
             it.assertTrue(np.alltrue(spectrogram_transformer.transform(x) == Sxx.transpose()))
 
         @it.should('SpectrogramTransformer fit_transform method')
-        def test3(case):
+        def spectrogram_test3(case):
             it.assertTrue(np.alltrue(spectrogram_transformer.fit_transform(x) == Sxx.transpose()))
 
     with it.having('WaeveletTransformer test group'):
@@ -49,15 +49,15 @@ with such.A('sample test') as it:
         waevelet_transformer = WaeveletTransformer(widths, 'mexh')
         
         @it.should('WaeveletTransformer fit method')
-        def test1(case):
+        def waevelet_test1(case):
             it.assertIsInstance(waevelet_transformer.fit(sig), WaeveletTransformer)
 
         @it.should('WaeveletTransformer transform method')
-        def test2(case):
+        def waevelet_test2(case):
             it.assertTrue(np.alltrue(waevelet_transformer.transform(sig) == cwtmatr))
 
         @it.should('WaeveletTransformer fit_transform method')
-        def test3(case):
+        def waevelet_test3(case):
             it.assertTrue(np.alltrue(waevelet_transformer.fit_transform(sig) == cwtmatr))
 
 it.createTests(globals())
