@@ -1,5 +1,5 @@
 from sklearn.preprocessing import FunctionTransformer
-
+import pandas as pd
 
 class ReshapeInto2d(FunctionTransformer):
     def __init__(self,
