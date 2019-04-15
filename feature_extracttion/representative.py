@@ -1,8 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import FunctionTransformer
 
-from wrapper.extentions import min_max_transf
-
 
 class PercentileSummaryTransformer(FunctionTransformer):
 
@@ -35,29 +33,24 @@ class PercentileSummaryTransformer(FunctionTransformer):
             summary = np.vstack(
                 [np.vstack([mean, std, std_top, std_bot, max_range]), percentile_calc, relative_percentile]).transpose()
         else:
-            ValueError("not implemented")
+            raise ValueError("not implemented")
         if self.should_flat:
             return summary.flatten()
         return summary
 
 
 class SummaryTransformer(FunctionTransformer):
-    max_num = 127
-    min_num = -128
 
-    def __init__(self, axis=0, scale="minmax",
+    def __init__(self, axis=0,
                  kw_args=None, inv_kw_args=None):
         validate = False
         inverse_func = None
         accept_sparse = False
-        self.scale = scale
         pass_y = 'deprecated'
         super().__init__(self.f, inverse_func, validate, accept_sparse, pass_y, kw_args, inv_kw_args)
         self.axis = axis
 
     def f(self, X):
-        if self.scale == "minmax":
-            X = min_max_transf(X, min_data=self.min_num, max_data=self.max_num)
         avgs = np.mean(X, axis=self.axis)
         stds = np.std(X, axis=self.axis)
         maxs = np.max(X, axis=self.axis)
