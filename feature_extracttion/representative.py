@@ -1,23 +1,19 @@
 import numpy as np
-from sklearn.preprocessing import FunctionTransformer
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
-class PercentileSummaryTransformer(FunctionTransformer):
+class PercentileSummaryTransformer(BaseEstimator, TransformerMixin):
 
     def __init__(self, axis=0, should_flat=True,
                  kw_args=None, inv_kw_args=None):
-        validate = False
-        inverse_func = None
-        accept_sparse = False
-        pass_y = 'deprecated'
         self.axis = axis
         self.should_flat = should_flat
-        super().__init__(self.f, inverse_func, validate, accept_sparse, pass_y, kw_args, inv_kw_args)
+        super().__init__()
 
-    def f(self, X):
-        return self.percentile_summarize(X)
+    def fit(self, X, y=None):
+        return self
 
-    def percentile_summarize(self, X):
+    def transform(self, X):
         mean = X.mean(axis=self.axis)
         std = X.std(axis=self.axis)
         std_top = mean + std
@@ -39,18 +35,18 @@ class PercentileSummaryTransformer(FunctionTransformer):
         return summary
 
 
-class SummaryTransformer(FunctionTransformer):
+class SummaryTransformer(BaseEstimator, TransformerMixin):
 
     def __init__(self, axis=0,
                  kw_args=None, inv_kw_args=None):
-        validate = False
-        inverse_func = None
-        accept_sparse = False
-        pass_y = 'deprecated'
-        super().__init__(self.f, inverse_func, validate, accept_sparse, pass_y, kw_args, inv_kw_args)
         self.axis = axis
+        super().__init__()
+        
 
-    def f(self, X):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
         avgs = np.mean(X, axis=self.axis)
         stds = np.std(X, axis=self.axis)
         maxs = np.max(X, axis=self.axis)
@@ -59,16 +55,15 @@ class SummaryTransformer(FunctionTransformer):
         return np.hstack([avgs, stds, maxs, mins, medians])
 
 
-class AverageTransformer(FunctionTransformer):
+class AverageTransformer(BaseEstimator, TransformerMixin):
 
     def __init__(self,
                  kw_args=None, inv_kw_args=None):
-        validate = False
-        inverse_func = None
-        accept_sparse = False
-        pass_y = 'deprecated'
-        super().__init__(self.f, inverse_func, validate, accept_sparse, pass_y, kw_args, inv_kw_args)
+        super().__init__()
 
-    def f(self, X):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
         avgs = np.mean(X, axis=1)
         return avgs.reshape((-1, 1))
