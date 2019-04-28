@@ -1,8 +1,8 @@
 import numpy as np
-from scipy import signal
-import pywt
-from nose2.tools  import such
-from feature_extracttion.representative import PercentileSummaryTransformer, SummaryTransformer, AverageTransformer
+from nose2.tools import such
+
+from shortscikit.feature_extracttion.representative import PercentileSummaryTransformer, SummaryTransformer, \
+    AverageTransformer
 
 #>>> nose2 --plugin=nose2.plugins.layers
 

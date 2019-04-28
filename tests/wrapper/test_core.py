@@ -5,7 +5,7 @@ import numpy as np
 from nose2.tools import such
 from sklearn.preprocessing import FunctionTransformer, StandardScaler
 
-from wrapper.core import WindowTransformerWrapper, TransformerWrapper
+from shortscikit.wrapper.core import WindowTransformerWrapper, TransformerWrapper
 
 
 class DummySumFitter(FunctionTransformer):
