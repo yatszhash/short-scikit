@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from feature_extracttion.shape import to_2d_array
+from .shape import to_2d_array
 
 
 class LimitMax(BaseEstimator, TransformerMixin):
