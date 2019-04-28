@@ -1,9 +1,8 @@
 import numpy as np
-from scipy import signal
-import pywt
-from nose2.tools  import such
-from feature_extracttion.scaler import LimitMax, LogTransformer, TahnEstimators
-from feature_extracttion.shape import to_2d_array
+from nose2.tools import such
+
+from shortscikit.feature_extracttion.scaler import LimitMax, LogTransformer, TahnEstimators
+from shortscikit.feature_extracttion.shape import to_2d_array
 
 #>>> nose2 --plugin=nose2.plugins.layers
 

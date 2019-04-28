@@ -1,8 +1,10 @@
 import numpy as np
-from scipy import signal
 import pywt
-from nose2.tools  import such
-from feature_extracttion.signal import SpectrogramTransformer,WaeveletTransformer
+from nose2.tools import such
+from scipy import signal
+
+from shortscikit.feature_extracttion.signal import SpectrogramTransformer, WaeveletTransformer
+
 #>>> nose2 --plugin=nose2.plugins.layers
 with such.A('sample test') as it:
     with it.having('SpectrogramTransformer test group'):

@@ -9,12 +9,12 @@ scipy = "*"
 pandas = "*"
 scikit-learn = "*"
 pywt = "*"
-nose2 = "*"
 gensim = "*"
 fasttext = {git = "https://github.com/facebookresearch/fastText.git"}
 pywavelets = "*"
 
 [dev-packages]
+nose2 = "*"
 
 [requires]
 python_version = "3.7"

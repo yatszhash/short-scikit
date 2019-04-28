@@ -2,6 +2,7 @@
 import logging
 from collections import OrderedDict
 
+import fastText
 import numpy as np
 from gensim.models import KeyedVectors
 from scipy import sparse
@@ -9,7 +10,6 @@ from sklearn.base import BaseEstimator, ClusterMixin, TransformerMixin
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import FunctionTransformer
-import fastText
 
 logger = logging.getLogger(__name__)
 
