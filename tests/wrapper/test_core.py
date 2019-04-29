@@ -63,6 +63,17 @@ with such.A('transformer wrapper test') as it:
                 case.assertEqual(3, df.shape[1])
                 case.assertEqual(0, df.loc[2, 'a'])
 
+
+        @it.should('save transformed column df with feather')
+        def test_save(case):
+            with TemporaryDirectory() as temp_dir:
+                sut = TransformStage(transformer=StandardScaler())
+                actual = sut.fit_transform(it.df, feature_name='a', save_dir=Path(temp_dir),
+                                           save_format="feather", save_only_feature=True)
+                df = pd.read_feather(Path(temp_dir).joinpath("feature.feather"))
+                case.assertEqual(1, df.shape[1])
+                case.assertEqual(0, df.loc[2, 'a'])
+
     it.createTests(globals())
 
 with such.A('window transformer wrapper test') as it:
