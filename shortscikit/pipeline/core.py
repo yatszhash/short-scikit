@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Union
 
 import numpy as np  # linear algebra
+import pandas as pd
 import scipy.sparse as sparse
 from sklearn.base import TransformerMixin
 from sklearn.externals import joblib
@@ -19,7 +20,7 @@ class DataAdaptor(object, metaclass=ABCMeta):
         self.x_like = x_like
 
     @abstractmethod
-    def apply_transform(self, func):
+    def apply_transform(self, func, **kwargs):
         return self.x_like
 
     @abstractmethod
@@ -39,16 +40,40 @@ class NdArrayAdaptor(DataAdaptor):
     def __init__(self, x_like):
         super().__init__(x_like)
 
-    def apply_transform(self, func):
+    def apply_transform(self, func, **kwargs):
         return func(self.x_like)
 
     def apply_fit(self, func):
         return func(self.x_like)
 
 
-def create_data_adaptor(x_like: [np.ndarray]):
+class PandasDataFrameAdaptor(DataAdaptor):
+
+    def __init__(self, x_like, feature_name):
+        super().__init__(x_like)
+        self.feature_name = feature_name
+
+    def apply_fit(self, func):
+        func(self.x_like[self.feature_name].values.reshape((self.x_like.shape[0], -1)))
+
+    def apply_transform(self, func, overwrite=True, suffix="", **kwargs):
+        # TODO support multiple columns
+        transformed_sequence = func(self.x_like[self.feature_name].values.reshape((self.x_like.shape[0], -1)))
+        if overwrite:
+            self.x_like[self.feature_name] = transformed_sequence
+        else:
+            self.x_like[suffix + "_" + self.feature_name] = transformed_sequence
+        return self.x_like
+
+    def save_transformed(self, save_dir):
+        pass
+
+
+def create_data_adaptor(x_like: [np.ndarray], feature_name=None):
     if isinstance(x_like, np.ndarray):
         return NdArrayAdaptor(x_like)
+    elif isinstance(x_like, pd.DataFrame):
+        return PandasDataFrameAdaptor(x_like, feature_name)
     else:
         raise ValueError("{} is not supported".format(type(x_like)))
 
@@ -63,11 +88,13 @@ class TransformStage(object, metaclass=ABCMeta):
         if transformer_path:
             self.transformer = joblib.load(transformer_path)
 
-    def fit_transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None):
-        return self.fit(x_like, save_dir, n_jobs).transform(x_like, save_dir, n_jobs)
+    def fit_transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None,
+                      feature_name=None, new_feature_suffix=None):
+        return self.fit(x_like, save_dir, n_jobs, feature_name).transform(x_like, save_dir, n_jobs, feature_name,
+                                                                          new_feature_suffix)
 
-    def fit(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None):
-        adaptor = create_data_adaptor(x_like)
+    def fit(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None, feature_name=None):
+        adaptor = create_data_adaptor(x_like, feature_name=feature_name)
         # if not sparse.issparse(x_like) and not isinstance(x_like, np.ndarray):
         #     raise ValueError("not implemented for type {}".format(type(x_like)))
 
@@ -77,12 +104,14 @@ class TransformStage(object, metaclass=ABCMeta):
             joblib.dump(self.transformer, str(save_dir.joinpath("transformer.pickle")))
         return self
 
-    def transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None):
-        adaptor = create_data_adaptor(x_like)
+    def transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None,
+                  feature_name=None, new_feature_suffix=None):
+        adaptor = create_data_adaptor(x_like, feature_name=feature_name)
         # if not sparse.issparse(x_like) and not isinstance(x_like, np.ndarray):
         #     raise ValueError("not implemented for type {}".format(type(x_like)))
 
-        x_like = adaptor.apply_transform(self.transformer.transform)
+        x_like = adaptor.apply_transform(self.transformer.transform, overwrite=not new_feature_suffix,
+                                         suffix=new_feature_suffix, feature_name=feature_name)
 
         # TODO enable changer type of save and name
         if save_dir:
@@ -92,9 +121,8 @@ class TransformStage(object, metaclass=ABCMeta):
 
 class WindowTransformStage(TransformStage):
 
-    def __init__(self, window_size, step_size, transformer: TransformerMixin = None, transformer_path=None,
-                 axis=1):
-        super().__init__(transformer, transformer_path)
+    def __init__(self, window_size, step_size=0, axis=1, transformer=None, transformer_path=None):
+        super().__init__(transformer, transformer_path=transformer_path)
         self.window_size = window_size
         self.step_size = step_size
         if axis <= 0:
@@ -102,7 +130,7 @@ class WindowTransformStage(TransformStage):
         self.axis = axis
         # TODO padding
 
-    def fit(self, x_like: Union[np.ndarray], save_dir=None, n_jobs=None):
+    def fit(self, x_like: Union[np.ndarray], save_dir=None, n_jobs=None, feature_name=None):
         # TODO support sparse matrix
         x_like = self.to_windows(x_like)
         x_like = self.stack(x_like)
@@ -115,7 +143,8 @@ class WindowTransformStage(TransformStage):
         x_like = x_like.reshape(stacked_shape)
         return x_like
 
-    def transform(self, x_like: Union[np.ndarray], save_dir=None, n_jobs=None):
+    def transform(self, x_like: Union[np.ndarray], save_dir=None, n_jobs=None, feature_name=None,
+                  new_feature_suffix=None):
         x_like = self.to_windows(x_like)
         transformed_shape = list(x_like.shape)
 
