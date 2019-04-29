@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "33a28c1d19fa7749b7ece5dcf9f063294661673580248f902f173baa517042dc"
+            "sha256": "b6732295cb929fc9f9f6355b14ab4553ccc7eeccaf5f71adc5f80c9d014945a9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -61,7 +61,7 @@
         },
         "fasttext": {
             "git": "https://github.com/facebookresearch/fastText.git",
-            "ref": "157e80e5775e57f9c2e0e20ac8ab6721d4771169"
+            "ref": "6dd2e11b5fe82854c4529d2a58d699b2cb182b1b"
         },
         "gensim": {
             "hashes": [
@@ -199,13 +199,6 @@
             ],
             "index": "pypi",
             "version": "==1.0.3"
-        },
-        "pywt": {
-            "hashes": [
-                "sha256:baee7e430d8b07d4d5894c5aa733b1c5db29027a8f5bfa10b04b78f062d0984f"
-            ],
-            "index": "pypi",
-            "version": "==1.0.6"
         },
         "requests": {
             "hashes": [
