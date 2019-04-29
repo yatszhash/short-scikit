@@ -9,7 +9,6 @@ setup(
         "scipy",
         "pandas",
         "scikit-learn",
-        "pywt",
         "gensim",
         "pywavelets",
         "pybind11",

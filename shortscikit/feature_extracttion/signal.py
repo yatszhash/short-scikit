@@ -1,5 +1,5 @@
 import numpy as np
-import pywt as pywt
+import pywt
 from scipy import signal
 from sklearn.base import BaseEstimator,TransformerMixin
 
