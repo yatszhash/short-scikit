@@ -11,10 +11,10 @@ scikit-learn = "*"
 gensim = "*"
 fasttext = {git = "https://github.com/facebookresearch/fastText.git"}
 pywavelets = "*"
-pyarrow = "*"
 
 [dev-packages]
 nose2 = "*"
+pyarrow = "*"
 
 [requires]
 python_version = "3.7"
