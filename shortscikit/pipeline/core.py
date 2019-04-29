@@ -27,15 +27,11 @@ class DataAdaptor(object, metaclass=ABCMeta):
     def apply_fit(self, func):
         pass
 
-    @abstractmethod
-    def save_transformed(self, save_dir):
-        pass
+    def save(self, x_like, save_dir, format=None):
+        joblib.dump(x_like, str(save_dir.joinpath("x_like.pickle")))
 
 
 class NdArrayAdaptor(DataAdaptor):
-
-    def save_transformed(self, save_dir):
-        pass
 
     def __init__(self, x_like):
         super().__init__(x_like)
@@ -65,9 +61,10 @@ class PandasDataFrameAdaptor(DataAdaptor):
             self.x_like[suffix + "_" + self.feature_name] = transformed_sequence
         return self.x_like
 
-    def save_transformed(self, save_dir):
-        pass
-
+    def save(self, x_like, save_dir, format=None):
+        save_path = save_dir.joinpath("feature." + format)
+        save_func = getattr(x_like, "to_{}".format(format))
+        return save_func(save_path)
 
 def create_data_adaptor(x_like: [np.ndarray], feature_name=None):
     if isinstance(x_like, np.ndarray):
@@ -89,9 +86,9 @@ class TransformStage(object, metaclass=ABCMeta):
             self.transformer = joblib.load(transformer_path)
 
     def fit_transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None,
-                      feature_name=None, new_feature_suffix=None):
+                      feature_name=None, new_feature_suffix=None, save_format=None):
         return self.fit(x_like, save_dir, n_jobs, feature_name).transform(x_like, save_dir, n_jobs, feature_name,
-                                                                          new_feature_suffix)
+                                                                          new_feature_suffix, save_format)
 
     def fit(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None, feature_name=None):
         adaptor = create_data_adaptor(x_like, feature_name=feature_name)
@@ -105,7 +102,7 @@ class TransformStage(object, metaclass=ABCMeta):
         return self
 
     def transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None,
-                  feature_name=None, new_feature_suffix=None):
+                  feature_name=None, new_feature_suffix=None, save_format=None):
         adaptor = create_data_adaptor(x_like, feature_name=feature_name)
         # if not sparse.issparse(x_like) and not isinstance(x_like, np.ndarray):
         #     raise ValueError("not implemented for type {}".format(type(x_like)))
@@ -115,7 +112,7 @@ class TransformStage(object, metaclass=ABCMeta):
 
         # TODO enable changer type of save and name
         if save_dir:
-            joblib.dump(x_like, str(save_dir.joinpath("x_like.pickle")))
+            adaptor.save(x_like, save_dir, format=save_format)
         return x_like
 
 
@@ -144,7 +141,7 @@ class WindowTransformStage(TransformStage):
         return x_like
 
     def transform(self, x_like: Union[np.ndarray], save_dir=None, n_jobs=None, feature_name=None,
-                  new_feature_suffix=None):
+                  new_feature_suffix=None, save_format=None):
         x_like = self.to_windows(x_like)
         transformed_shape = list(x_like.shape)
 

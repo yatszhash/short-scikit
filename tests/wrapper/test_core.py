@@ -22,7 +22,6 @@ class DummySumFitter(FunctionTransformer):
 
 
 with such.A('transformer wrapper test') as it:
-
     @it.should('save output and pickle')
     def test_with_array(case):
         with TemporaryDirectory() as temp_dir:
@@ -33,7 +32,7 @@ with such.A('transformer wrapper test') as it:
 
 
     with it.having('prepared dataframe'):
-        @it.has_setup
+        @it.has_test_setup
         def setup():
             it.df = pd.DataFrame(np.arange(1, 6).repeat(2, axis=0).reshape((-1, 2)), columns=["a", "b"])
 
@@ -47,11 +46,22 @@ with such.A('transformer wrapper test') as it:
 
 
         @it.should('have new transformed column')
-        def test_overwrite_column(case):
+        def test_new_column(case):
             sut = TransformStage(transformer=StandardScaler())
             actual = sut.fit_transform(it.df, feature_name='a', new_feature_suffix='new')
             case.assertEqual(3, actual.shape[1])
             case.assertEqual(0, actual.loc[2, 'new_a'])
+
+
+        @it.should('save transformed df with csv format')
+        def test_save(case):
+            with TemporaryDirectory() as temp_dir:
+                sut = TransformStage(transformer=StandardScaler())
+                actual = sut.fit_transform(it.df, feature_name='a', save_dir=Path(temp_dir),
+                                           save_format="csv")
+                df = pd.read_csv(Path(temp_dir).joinpath("feature.csv"))
+                case.assertEqual(3, df.shape[1])
+                case.assertEqual(0, df.loc[2, 'a'])
 
     it.createTests(globals())
 
