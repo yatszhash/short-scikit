@@ -1,5 +1,5 @@
 import os
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from typing import Union
 
@@ -11,6 +11,46 @@ from sklearn.externals import joblib
 RANDOM_STATE = 10
 
 n_cpus = os.cpu_count()
+
+
+class DataAdaptor(object, metaclass=ABCMeta):
+
+    def __init__(self, x_like):
+        self.x_like = x_like
+
+    @abstractmethod
+    def apply_transform(self, func):
+        return self.x_like
+
+    @abstractmethod
+    def apply_fit(self, func):
+        pass
+
+    @abstractmethod
+    def save_transformed(self, save_dir):
+        pass
+
+
+class NdArrayAdaptor(DataAdaptor):
+
+    def save_transformed(self, save_dir):
+        pass
+
+    def __init__(self, x_like):
+        super().__init__(x_like)
+
+    def apply_transform(self, func):
+        return func(self.x_like)
+
+    def apply_fit(self, func):
+        return func(self.x_like)
+
+
+def create_data_adaptor(x_like: [np.ndarray]):
+    if isinstance(x_like, np.ndarray):
+        return NdArrayAdaptor(x_like)
+    else:
+        raise ValueError("{} is not supported".format(type(x_like)))
 
 
 class TransformStage(object, metaclass=ABCMeta):
@@ -27,21 +67,22 @@ class TransformStage(object, metaclass=ABCMeta):
         return self.fit(x_like, save_dir, n_jobs).transform(x_like, save_dir, n_jobs)
 
     def fit(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None):
+        adaptor = create_data_adaptor(x_like)
+        # if not sparse.issparse(x_like) and not isinstance(x_like, np.ndarray):
+        #     raise ValueError("not implemented for type {}".format(type(x_like)))
 
-        if not sparse.issparse(x_like) and not isinstance(x_like, np.ndarray):
-            raise ValueError("not implemented for type {}".format(type(x_like)))
-
-        self.transformer.fit(x_like)
+        adaptor.apply_fit(self.transformer.fit)
         # TODO enable change name of pickle
         if save_dir:
             joblib.dump(self.transformer, str(save_dir.joinpath("transformer.pickle")))
         return self
 
     def transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None):
-        if not sparse.issparse(x_like) and not isinstance(x_like, np.ndarray):
-            raise ValueError("not implemented for type {}".format(type(x_like)))
+        adaptor = create_data_adaptor(x_like)
+        # if not sparse.issparse(x_like) and not isinstance(x_like, np.ndarray):
+        #     raise ValueError("not implemented for type {}".format(type(x_like)))
 
-        x_like = self.transformer.transform(x_like)
+        x_like = adaptor.apply_transform(self.transformer.transform)
 
         # TODO enable changer type of save and name
         if save_dir:
