@@ -5,7 +5,7 @@ import numpy as np
 from nose2.tools import such
 from sklearn.preprocessing import FunctionTransformer, StandardScaler
 
-from shortscikit.wrapper.core import WindowTransformerWrapper, TransformerWrapper
+from shortscikit.pipeline.core import WindowTransformStage, TransformStage
 
 
 class DummySumFitter(FunctionTransformer):
@@ -24,7 +24,7 @@ with such.A('transformer wrapper test') as it:
     @it.should('save output and pickle')
     def test():
         with TemporaryDirectory() as temp_dir:
-            sut = TransformerWrapper(transformer=StandardScaler())
+            sut = TransformStage(transformer=StandardScaler())
             sut.fit_transform(np.arange(10).reshape((-1, 1)).astype("float"), save_dir=Path(temp_dir))
             it.assertTrue(Path(temp_dir).joinpath("transformer.pickle").exists())
             it.assertTrue(Path(temp_dir).joinpath("x_like.pickle").exists())
@@ -37,8 +37,8 @@ with such.A('window transformer wrapper test') as it:
     def test():
         x = np.arange(100).reshape((1, -1)).repeat(50, axis=0)
 
-        sut = WindowTransformerWrapper(window_size=4, step_size=2,
-                                       transformer=FunctionTransformer(lambda z: np.sum(z, axis=-1),
+        sut = WindowTransformStage(window_size=4, step_size=2,
+                                   transformer=FunctionTransformer(lambda z: np.sum(z, axis=-1),
                                                                        validate=False))
         x = sut.transform(x)
         it.assertEqual(x.shape[0], 50)
@@ -54,8 +54,8 @@ with such.A('window transformer wrapper test') as it:
     def test():
         x = np.arange(4).reshape((1, -1)).repeat(10, axis=0)
 
-        sut = WindowTransformerWrapper(window_size=2, step_size=2,
-                                       transformer=DummySumFitter())
+        sut = WindowTransformStage(window_size=2, step_size=2,
+                                   transformer=DummySumFitter())
         x = sut.fit(x)
         np.testing.assert_array_equal(sut.transformer.total, np.array([20, 40]))
 
