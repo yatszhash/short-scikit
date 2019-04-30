@@ -17,7 +17,8 @@ setup(
         "fasttext @ git+https://github.com/facebookresearch/fastText.git"
     ],
     tests_require=[
-        "nose2"
+        "nose2",
+        "pyarrow"
     ],
     # dependency_links=["git+https: // github.com / facebookresearch / fastText.git#egg=fasttext-0.8.22"],
     url='https://github.com/yatszhash/short-scikit',

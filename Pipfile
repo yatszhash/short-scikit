@@ -14,6 +14,7 @@ pywavelets = "*"
 
 [dev-packages]
 nose2 = "*"
+pyarrow = "*"
 
 [requires]
 python_version = "3.7"
