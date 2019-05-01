@@ -1,5 +1,6 @@
 
 import logging
+import os
 from collections import OrderedDict
 
 import fastText
@@ -10,6 +11,9 @@ from sklearn.base import BaseEstimator, ClusterMixin, TransformerMixin
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import FunctionTransformer
+
+import MeCab
+from janome.tokenizer import Tokenizer as JanomeTokenizer
 
 logger = logging.getLogger(__name__)
 
@@ -123,9 +127,9 @@ class IdfStoredCountVectorizer(TfidfVectorizer):
         super().__init__(input, encoding, decode_error, strip_accents, lowercase, preprocessor, tokenizer, analyzer,
                          stop_words, token_pattern, ngram_range, max_df, min_df, max_features, vocabulary, binary,
                          dtype, norm, use_idf, smooth_idf, sublinear_tf)
-
+                         
     def transform(self, raw_documents, copy=True):
-        return super(TfidfVectorizer, self).transform(raw_documents)
+        return super(IdfStoredCountVectorizer, self).transform(raw_documents)
 
     def fit_transform(self, raw_documents, y=None):
         return self.fit(raw_documents, y).transform(raw_documents)
@@ -153,3 +157,23 @@ class EmbeddingTransformer(FunctionTransformer):
 class FastTextTokenizer(FunctionTransformer):
     def __init__(self):
         super().__init__(lambda X: [fastText.tokenize(x) if x else [] for x in X], validate=False)
+
+
+class JapaneseTokenizer(BaseEstimator, TransformerMixin):
+
+    def __init__(self,parser_type='MeCab'):
+        self.parser_type = parser_type
+        
+        if self.parser_type == 'MeCab':
+            self.tokenizer =  MeCab.Tagger('-Owakati') 
+        elif self.parser_type == 'janome':
+            self.tokenizer = JanomeTokenizer()
+        
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        if self.parser_type == 'MeCab':
+            return self.tokenizer.parse(X).split(' ')[:-1]
+        elif self.parser_type == 'janome':
+            return self.tokenizer.tokenize(X, wakati=True)
