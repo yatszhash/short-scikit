@@ -3,7 +3,7 @@ import logging
 import os
 from collections import OrderedDict
 
-import fastText
+import fasttext
 import numpy as np
 from gensim.models import KeyedVectors
 from scipy import sparse

@@ -1,5 +1,6 @@
 from setuptools import find_packages, setup
-
+import sys
+mecab_package = "mecab-python-windows" if sys.platform == "win32" else "mecab-python3"
 setup(
     name='shortscikit',
     version='0.0.1',
@@ -13,6 +14,7 @@ setup(
         "pywavelets",
         "pybind11",
         "cython",
+        mecab_package,
         # "fasttext==0.8.22",
         "fasttext @ git+https://github.com/facebookresearch/fastText.git"
     ],
