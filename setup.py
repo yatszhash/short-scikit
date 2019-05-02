@@ -15,6 +15,7 @@ setup(
         "pybind11",
         "cython",
         mecab_package,
+        "janome",
         # "fasttext==0.8.22",
         "fasttext @ git+https://github.com/facebookresearch/fastText.git"
     ],
