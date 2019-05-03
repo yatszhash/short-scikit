@@ -1,5 +1,5 @@
-
 import logging
+import os
 from collections import OrderedDict
 
 import fastText
@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 class Scdv(BaseEstimator, ClusterMixin, TransformerMixin):
     """ implementation of https://dheeraj7596.github.io/SDV/"""
+
     # TODO accept args for idfvectorizer
     def __init__(self, word_emb_func=None, stop_words=None, sparse_threshold_p=0.04,
                  n_components=50, covariance_type="full", tol=0.001, reg_covar=1e-06, max_iter=100, n_init=1,
@@ -90,7 +91,7 @@ class Scdv(BaseEstimator, ClusterMixin, TransformerMixin):
             word_cluster_prob = semantic_cluster_probs[i]
             word_cluster_prob = word_cluster_prob.reshape((1, word_cluster_prob.shape[0]))
             word_topic_vectors[i, :] = (np.dot(word_vec, word_cluster_prob)
-                                       * self.to_idf(word_index)).reshape(word_topic_vectors.shape[1:])
+                                        * self.to_idf(word_index)).reshape(word_topic_vectors.shape[1:])
         return word_topic_vectors
 
     def _compute_sparse_threshold_ratio(self, non_sparse_doc_vectors):
@@ -125,7 +126,7 @@ class IdfStoredCountVectorizer(TfidfVectorizer):
                          dtype, norm, use_idf, smooth_idf, sublinear_tf)
 
     def transform(self, raw_documents, copy=True):
-        return super(TfidfVectorizer, self).transform(raw_documents)
+        return super(IdfStoredCountVectorizer, self).transform(raw_documents)
 
     def fit_transform(self, raw_documents, y=None):
         return self.fit(raw_documents, y).transform(raw_documents)
@@ -153,3 +154,27 @@ class EmbeddingTransformer(FunctionTransformer):
 class FastTextTokenizer(FunctionTransformer):
     def __init__(self):
         super().__init__(lambda X: [fastText.tokenize(x) if x else [] for x in X], validate=False)
+
+
+class JapaneseTokenizer(BaseEstimator, TransformerMixin):
+
+    def __init__(self, parser_type='MeCab'):
+        self.parser_type = parser_type
+
+        if self.parser_type == 'MeCab':
+            import MeCab
+            self.tokenizer = MeCab.Tagger('-Owakati')
+        elif self.parser_type == 'janome':
+            from janome.tokenizer import Tokenizer
+            self.tokenizer = Tokenizer()
+        else:
+            raise ValueError("parser_type should be 'MeCab' or 'janome'")
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        if self.parser_type == 'MeCab':
+            return self.tokenizer.parse(X).split(' ')[:-1]
+        elif self.parser_type == 'janome':
+            return self.tokenizer.tokenize(X, wakati=True)
