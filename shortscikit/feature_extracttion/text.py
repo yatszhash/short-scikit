@@ -1,4 +1,3 @@
-
 import logging
 import os
 from collections import OrderedDict
@@ -12,14 +11,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import FunctionTransformer
 
-import MeCab
-from janome.tokenizer import Tokenizer as JanomeTokenizer
-
 logger = logging.getLogger(__name__)
 
 
 class Scdv(BaseEstimator, ClusterMixin, TransformerMixin):
     """ implementation of https://dheeraj7596.github.io/SDV/"""
+
     # TODO accept args for idfvectorizer
     def __init__(self, word_emb_func=None, stop_words=None, sparse_threshold_p=0.04,
                  n_components=50, covariance_type="full", tol=0.001, reg_covar=1e-06, max_iter=100, n_init=1,
@@ -94,7 +91,7 @@ class Scdv(BaseEstimator, ClusterMixin, TransformerMixin):
             word_cluster_prob = semantic_cluster_probs[i]
             word_cluster_prob = word_cluster_prob.reshape((1, word_cluster_prob.shape[0]))
             word_topic_vectors[i, :] = (np.dot(word_vec, word_cluster_prob)
-                                       * self.to_idf(word_index)).reshape(word_topic_vectors.shape[1:])
+                                        * self.to_idf(word_index)).reshape(word_topic_vectors.shape[1:])
         return word_topic_vectors
 
     def _compute_sparse_threshold_ratio(self, non_sparse_doc_vectors):
@@ -127,7 +124,7 @@ class IdfStoredCountVectorizer(TfidfVectorizer):
         super().__init__(input, encoding, decode_error, strip_accents, lowercase, preprocessor, tokenizer, analyzer,
                          stop_words, token_pattern, ngram_range, max_df, min_df, max_features, vocabulary, binary,
                          dtype, norm, use_idf, smooth_idf, sublinear_tf)
-                         
+
     def transform(self, raw_documents, copy=True):
         return super(IdfStoredCountVectorizer, self).transform(raw_documents)
 
@@ -161,14 +158,18 @@ class FastTextTokenizer(FunctionTransformer):
 
 class JapaneseTokenizer(BaseEstimator, TransformerMixin):
 
-    def __init__(self,parser_type='MeCab'):
+    def __init__(self, parser_type='MeCab'):
         self.parser_type = parser_type
-        
+
         if self.parser_type == 'MeCab':
-            self.tokenizer =  MeCab.Tagger('-Owakati') 
+            import MeCab
+            self.tokenizer = MeCab.Tagger('-Owakati')
         elif self.parser_type == 'janome':
-            self.tokenizer = JanomeTokenizer()
-        
+            from janome.tokenizer import Tokenizer
+            self.tokenizer = Tokenizer()
+        else:
+            raise ValueError("parser_type should be 'MeCab' or 'janome'")
+
     def fit(self, X, y=None):
         return self
 

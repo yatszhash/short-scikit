@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3e0b51c016c4b20038a0863b528268298f20dfb12385a9bc8eaaa8238186d811"
+            "sha256": "22c3c18e52d290a99f952bd9cc580fc8123176c36fa8d156b025f5f99b957062"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -90,6 +90,14 @@
                 "sha256:ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"
             ],
             "version": "==2.8"
+        },
+        "janome": {
+            "hashes": [
+                "sha256:29132ce7123287e39a666a041dee299178fdfb0777d8d996f164fa82e4daa6ae",
+                "sha256:a52349e7e3b7df20ac215ccf41f8e04dbac4f2b97f2d69d26b04759d4bbdff1b"
+            ],
+            "index": "pypi",
+            "version": "==0.3.8"
         },
         "jmespath": {
             "hashes": [

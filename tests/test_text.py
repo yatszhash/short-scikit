@@ -5,7 +5,6 @@ from nose2.tools import such
 from shortscikit.feature_extracttion.text import JapaneseTokenizer
 from sklearn.feature_extraction.text import CountVectorizer
 from janome.tokenizer import Tokenizer as JanomeTokenizer
-#>>> nose2 --plugin=nose2.plugins.layers
 
 with such.A('sample test') as it:
 
