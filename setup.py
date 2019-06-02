@@ -1,6 +1,16 @@
-from setuptools import find_packages, setup
 import sys
+
+from setuptools import find_packages, setup
+
 mecab_package = "mecab-python-windows" if sys.platform == "win32" else "mecab-python3"
+optional_requires = ["pyarrow",
+                     mecab_package,
+                     "janome",
+                     # "fasttext==0.8.22",
+                     "fastText @ git+https://github.com/facebookresearch/fastText.git",
+                     "pywavelets"
+                     ]
+
 setup(
     name='shortscikit',
     version='0.0.1',
@@ -11,18 +21,15 @@ setup(
         "pandas",
         "scikit-learn",
         "gensim",
-        "pywavelets",
         "pybind11",
-        "cython",
-        mecab_package,
-        "janome",
-        # "fasttext==0.8.22",
-        "fasttext @ git+https://github.com/facebookresearch/fastText.git"
+        "cython"
     ],
     tests_require=[
-        "nose2",
-        "pyarrow"
-    ],
+                      "nose2",
+                  ] + optional_requires,
+    extras_require={
+        'all': optional_requires
+    },
     # dependency_links=["git+https: // github.com / facebookresearch / fastText.git#egg=fasttext-0.8.22"],
     url='https://github.com/yatszhash/short-scikit',
     license='MIT',
