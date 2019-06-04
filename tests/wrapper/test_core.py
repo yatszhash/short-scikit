@@ -39,16 +39,16 @@ with such.A('transformer wrapper test') as it:
 
         @it.should('have overwritten transformed column')
         def test_overwrite_column(case):
-            sut = TransformStage(transformer=StandardScaler())
-            actual = sut.fit_transform(it.df, feature_name='a')
+            sut = TransformStage(transformer=StandardScaler(), feature_name='a')
+            actual = sut.fit_transform(it.df)
             case.assertEqual(2, actual.shape[1])
             case.assertEqual(0, actual.loc[2, 'a'])
 
 
         @it.should('have new transformed column')
         def test_new_column(case):
-            sut = TransformStage(transformer=StandardScaler())
-            actual = sut.fit_transform(it.df, feature_name='a', new_feature_suffix='new')
+            sut = TransformStage(transformer=StandardScaler(), feature_name='a', new_feature_suffix='new')
+            actual = sut.fit_transform(it.df)
             case.assertEqual(3, actual.shape[1])
             case.assertEqual(0, actual.loc[2, 'new_a'])
 
@@ -56,8 +56,8 @@ with such.A('transformer wrapper test') as it:
         @it.should('save transformed df with csv format')
         def test_save(case):
             with TemporaryDirectory() as temp_dir:
-                sut = TransformStage(transformer=StandardScaler())
-                actual = sut.fit_transform(it.df, feature_name='a', save_dir=Path(temp_dir),
+                sut = TransformStage(transformer=StandardScaler(), feature_name='a')
+                actual = sut.fit_transform(it.df, save_dir=Path(temp_dir),
                                            save_format="csv")
                 df = pd.read_csv(Path(temp_dir).joinpath("feature.csv"))
                 case.assertEqual(3, df.shape[1])
@@ -67,8 +67,8 @@ with such.A('transformer wrapper test') as it:
         @it.should('save transformed column df with feather')
         def test_save(case):
             with TemporaryDirectory() as temp_dir:
-                sut = TransformStage(transformer=StandardScaler())
-                actual = sut.fit_transform(it.df, feature_name='a', save_dir=Path(temp_dir),
+                sut = TransformStage(transformer=StandardScaler(), feature_name='a')
+                actual = sut.fit_transform(it.df, save_dir=Path(temp_dir),
                                            save_format="feather", save_only_feature=True)
                 df = pd.read_feather(Path(temp_dir).joinpath("feature.feather"))
                 case.assertEqual(1, df.shape[1])
