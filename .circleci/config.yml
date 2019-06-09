@@ -59,6 +59,10 @@ jobs:
           name: run unit tests
           command: |
             mkdir -p /tmp/unit-test-coverage
+            pip install pipenv
+            pipenv claen
+            pipenv install
+            pipenv shell
             cd ./tests
             nose2 --with-coverage --coverage-report html
             cp -r ./unit-test-coverage /tmp/unit-test-coverage
