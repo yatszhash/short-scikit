@@ -9,15 +9,16 @@ scipy = "*"
 pandas = "*"
 scikit-learn = "*"
 gensim = "*"
-fasttext = {git = "https://github.com/facebookresearch/fastText.git"}
-pywavelets = "*"
-mecab-python-windows = {version = "*",sys_platform = "== 'win32'"}
-mecab-python3 = {version = "*",markers = "sys_platform == 'linux' or sys_platform == 'darwin'"}
-janome = "*"
 
 [dev-packages]
 nose2 = "*"
 pyarrow = "*"
+fasttext = {git = "https://github.com/facebookresearch/fastText.git"}
+mecab-python-windows = {version = "*",sys_platform = "== 'win32'"}
+mecab-python3 = {version = "*",markers = "sys_platform == 'linux' or sys_platform == 'darwin'"}
+janome = "*"
+pywavelets = "*"
+
 
 [requires]
 python_version = "3.7"
