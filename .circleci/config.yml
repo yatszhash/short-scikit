@@ -58,6 +58,7 @@ jobs:
       - run:
           name: run unit tests
           command: |
+            . venv/bin/activate
             pip install nose2
             cd ./tests
             nose2 --with-coverage --coverage-report html
