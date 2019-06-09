@@ -65,5 +65,5 @@ jobs:
             cp -r ./unit-test-coverage /tmp
 
       - store_artifacts:
-          path: /tmp/unit-test-coverage/index.html
+          path: /tmp/unit-test-coverage
           
