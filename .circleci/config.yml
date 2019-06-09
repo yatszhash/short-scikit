@@ -58,11 +58,9 @@ jobs:
       - run:
           name: run unit tests
           command: |
-            mkdir -p /tmp/unit-test-coverage
-            pipenv clean
-            pipenv install
+            pip install nose2
             cd ./tests
-            pipenv run "nose2 --with-coverage --coverage-report html"
+            nose2 --with-coverage --coverage-report html
             cp -r ./unit-test-coverage /tmp
 
       - store_artifacts:
