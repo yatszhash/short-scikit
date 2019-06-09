@@ -63,7 +63,7 @@ jobs:
             pipenv install
             cd ./tests
             pipenv run "nose2 --with-coverage --coverage-report html"
-            cp -r ./unit-test-coverage /tmp/unit-test-coverage
+            cp -r ./unit-test-coverage /tmp
 
       - store_artifacts:
           path: /tmp/unit-test-coverage
