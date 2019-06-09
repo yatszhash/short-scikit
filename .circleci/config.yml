@@ -61,9 +61,8 @@ jobs:
             mkdir -p /tmp/unit-test-coverage
             pipenv clean
             pipenv install
-            pipenv shell
             cd ./tests
-            nose2 --with-coverage --coverage-report html
+            pipenv run "nose2 --with-coverage --coverage-report html"
             cp -r ./unit-test-coverage /tmp/unit-test-coverage
 
       - store_artifacts:
