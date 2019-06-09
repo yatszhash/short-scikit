@@ -59,8 +59,7 @@ jobs:
           name: run unit tests
           command: |
             mkdir -p /tmp/unit-test-coverage
-            pip install pipenv
-            pipenv claen
+            pipenv clean
             pipenv install
             pipenv shell
             cd ./tests
