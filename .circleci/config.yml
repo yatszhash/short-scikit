@@ -57,7 +57,7 @@ jobs:
 
       - run:
           name: run unit tests
-          commands: |
+          command: |
             mkdir /tmp/unit-test-coverage
             cd ./test
             nose2 --with-coverage --coverage-report html
