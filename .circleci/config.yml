@@ -58,11 +58,11 @@ jobs:
       - run:
           name: run unit tests
           command: |
-            mkdir /tmp/unit-test-coverage
-            cd ./test
+            mkdir -p /tmp/unit-test-coverage
+            cd ./tests
             nose2 --with-coverage --coverage-report html
-            cp -r ./unit-test-coverage /tmp
+            cp -r ./unit-test-coverage /tmp/unit-test-coverage
 
       - store_artifacts:
-          path: ./unit-test-coverage
-          destination: coverage-reports
+          path: /tmp/unit-test-coverage
+          
