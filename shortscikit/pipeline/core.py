@@ -184,8 +184,8 @@ class TransformPipeline(TransformStage):
                  feature_name=None,
                  new_feature_suffix=None):
         # TODO shouldn't pass dummy transformer
-        dummy_transfomer = FunctionTransformer(lambda x: x)
-        super().__init__(dummy_transfomer, transformer_path, feature_name, new_feature_suffix)
+        dummy_transformer = FunctionTransformer(lambda x: x)
+        super().__init__(dummy_transformer, transformer_path, feature_name, new_feature_suffix)
 
         # TODO support graph of stages
         if stages is not None:
