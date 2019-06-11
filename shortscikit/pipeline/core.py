@@ -93,11 +93,12 @@ class TransformStage(object, metaclass=ABCMeta):
             self.transformer = joblib.load(transformer_path)
         self.feature_name = feature_name
         self.new_feature_suffix = new_feature_suffix
+        self._transformed_cache = None
 
     def fit_transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None,
-                      save_format=None, save_only_feature=False):
+                      save_format=None, save_only_feature=False, cache=False):
         return self.fit(x_like, save_dir, n_jobs).transform(x_like, save_dir, n_jobs, save_format,
-                                                            save_only_feature)
+                                                            save_only_feature, cache)
 
     def fit(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None):
         adaptor = create_data_adaptor(x_like, feature_name=self.feature_name)
@@ -111,7 +112,7 @@ class TransformStage(object, metaclass=ABCMeta):
         return self
 
     def transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None,
-                  save_format=None, save_only_feature=False):
+                  save_format=None, save_only_feature=False, cache=False):
         adaptor = create_data_adaptor(x_like, feature_name=self.feature_name)
         # if not sparse.issparse(x_like) and not isinstance(x_like, np.ndarray):
         #     raise ValueError("not implemented for type {}".format(type(x_like)))
@@ -128,6 +129,9 @@ class TransformStage(object, metaclass=ABCMeta):
             else:
                 save_column = None
             adaptor.save(x_like, save_dir, format=save_format, only_feature=save_column)
+
+        if cache:
+            self._transformed_cache = x_like
         return x_like
 
 
@@ -158,7 +162,7 @@ class WindowTransformStage(TransformStage):
         return x_like
 
     def transform(self, x_like: Union[np.ndarray], save_dir=None, n_jobs=None,
-                  save_format=None, save_only_feature=False):
+                  save_format=None, save_only_feature=False, cache=False):
         x_like = self.to_windows(x_like)
         transformed_shape = list(x_like.shape)
 
@@ -166,7 +170,9 @@ class WindowTransformStage(TransformStage):
         x_like = self.stack(x_like)
         x_like = super().transform(x_like, save_dir, n_jobs)
         transformed_shape[-1] = -1
-        return x_like.reshape(transformed_shape)
+        x_like = x_like.reshape(transformed_shape)
+        if cache:
+            self._transformed_cache = x_like
 
     def to_windows(self, array_like):
         # TODO extract as transformer
@@ -182,7 +188,7 @@ class TransformPipeline(TransformStage):
 
     def __init__(self, *stages: Tuple[str, TransformStage], transformer_path=None,
                  feature_name=None,
-                 new_feature_suffix=None):
+                 new_feature_suffix=None, fit_raw=True):
         # TODO shouldn't pass dummy transformer
         dummy_transformer = FunctionTransformer(lambda x: x)
         super().__init__(dummy_transformer, transformer_path, feature_name, new_feature_suffix)
@@ -192,6 +198,7 @@ class TransformPipeline(TransformStage):
             self.stages: OrderedDict[str, TransformStage] = OrderedDict(stages)
         else:
             self.stages: OrderedDict[str, TransformStage] = OrderedDict()
+        self.fit_raw = fit_raw
 
     def append(self, name, stage: TransformStage):
         self.stages[name] = stage
@@ -210,9 +217,11 @@ class TransformPipeline(TransformStage):
         return stage_save_path
 
     def transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None,
-                  save_format=None, save_only_feature=False):
+                  save_format=None, save_only_feature=False, cache=False):
         for name, stage in self.stages.items():
             stage_save_path = self._to_stage_savepath(name, save_dir)
             x_like = stage.transform(x_like, stage_save_path, n_jobs, save_format=save_format,
                                      save_only_feature=save_only_feature)
+        if cache:
+            self._transformed_cache = cache
         return x_like
