@@ -173,6 +173,7 @@ class WindowTransformStage(TransformStage):
         x_like = x_like.reshape(transformed_shape)
         if cache:
             self._transformed_cache = x_like
+        return x_like
 
     def to_windows(self, array_like):
         # TODO extract as transformer
