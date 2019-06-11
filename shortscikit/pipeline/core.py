@@ -1,13 +1,15 @@
 import os
 from abc import ABCMeta, abstractmethod
+from collections import OrderedDict
 from pathlib import Path
-from typing import Union
+from typing import Union, Tuple
 
 import numpy as np  # linear algebra
 import pandas as pd
 import scipy.sparse as sparse
 from sklearn.base import TransformerMixin
 from sklearn.externals import joblib
+from sklearn.preprocessing import FunctionTransformer
 
 RANDOM_STATE = 10
 
@@ -174,3 +176,43 @@ class WindowTransformStage(TransformStage):
         window_indices = [list(range(i * self.step_size, i * self.step_size + self.window_size))
                           for i in range(n_windows)]
         return np.take(array_like, window_indices, axis=self.axis)
+
+
+class TransformPipeline(TransformStage):
+
+    def __init__(self, *stages: Tuple[str, TransformStage], transformer_path=None,
+                 feature_name=None,
+                 new_feature_suffix=None):
+        # TODO shouldn't pass dummy transformer
+        dummy_transfomer = FunctionTransformer(lambda x: x)
+        super().__init__(dummy_transfomer, transformer_path, feature_name, new_feature_suffix)
+
+        # TODO support graph of stages
+        if stages is not None:
+            self.stages: OrderedDict[str, TransformStage] = OrderedDict(stages)
+        else:
+            self.stages: OrderedDict[str, TransformStage] = OrderedDict()
+
+    def append(self, name, stage: TransformStage):
+        self.stages[name] = stage
+
+    def fit(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None):
+        # TODO support fit after transform stage
+        for name, stage in self.stages.items():
+            stage_save_path = self._to_stage_savepath(name, save_dir)
+            stage.fit(x_like, stage_save_path, n_jobs)
+        return self
+
+    def _to_stage_savepath(self, name, save_dir):
+        stage_save_path = save_dir.joinpath(name) if save_dir else None
+        if stage_save_path:
+            stage_save_path.mkdir(exist_ok=True, parents=True)
+        return stage_save_path
+
+    def transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None,
+                  save_format=None, save_only_feature=False):
+        for name, stage in self.stages.items():
+            stage_save_path = self._to_stage_savepath(name, save_dir)
+            x_like = stage.transform(x_like, stage_save_path, n_jobs, save_format=save_format,
+                                     save_only_feature=save_only_feature)
+        return x_like
