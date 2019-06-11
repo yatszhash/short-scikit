@@ -122,7 +122,7 @@ with such.A('test pipeline') as it:
                 sut.append("standard_scaler", TransformStage(transformer=StandardScaler(), feature_name='a'))
                 sut.append("dummy_sum", TransformStage(transformer=DummySumFitter(), feature_name="a"))
 
-                actual = sut.fit_transform(it.df, save_dir=Path(temp_dir), save_format="csv")
+                actual = sut.fit_transform(it.df.copy(), save_dir=Path(temp_dir), save_format="csv")
 
                 case.assertEqual(2, actual.shape[1])
                 case.assertEqual(0, actual.loc[2, 'a'])
@@ -132,6 +132,26 @@ with such.A('test pipeline') as it:
                 df = pd.read_csv(Path(temp_dir).joinpath("standard_scaler").joinpath("feature.csv"))
                 case.assertEqual(3, df.shape[1])
                 case.assertEqual(0, df.loc[2, 'a'])
+
+
+        @it.should('pipeline fit_transform with previous transformed feature')
+        def test(case):
+            with TemporaryDirectory() as temp_dir:
+                sut = TransformPipeline(fit_transformed=True)
+                sut.append("standard_scaler", TransformStage(transformer=StandardScaler(), feature_name='a'))
+                sut.append("dummy_sum", TransformStage(transformer=DummySumFitter(), feature_name="a"))
+
+                actual = sut.fit_transform(it.df.copy(), save_dir=Path(temp_dir), save_format="csv")
+
+                case.assertEqual(2, actual.shape[1])
+                case.assertEqual(0, actual.loc[2, 'a'])
+                np.testing.assert_array_equal(sut.stages.get("dummy_sum").transformer.total, np.array([0]))
+
+                # check saved
+                df = pd.read_csv(Path(temp_dir).joinpath("standard_scaler").joinpath("feature.csv"))
+                case.assertEqual(3, df.shape[1])
+                case.assertEqual(0, df.loc[2, 'a'])
+
 
     it.createTests(globals())
 

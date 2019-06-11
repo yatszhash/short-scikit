@@ -189,7 +189,7 @@ class TransformPipeline(TransformStage):
 
     def __init__(self, *stages: Tuple[str, TransformStage], transformer_path=None,
                  feature_name=None,
-                 new_feature_suffix=None, fit_raw=True):
+                 new_feature_suffix=None, fit_transformed=False):
         # TODO shouldn't pass dummy transformer
         dummy_transformer = FunctionTransformer(lambda x: x)
         super().__init__(dummy_transformer, transformer_path, feature_name, new_feature_suffix)
@@ -199,10 +199,20 @@ class TransformPipeline(TransformStage):
             self.stages: OrderedDict[str, TransformStage] = OrderedDict(stages)
         else:
             self.stages: OrderedDict[str, TransformStage] = OrderedDict()
-        self.fit_raw = fit_raw
+        self.fit_transformed = fit_transformed
 
     def append(self, name, stage: TransformStage):
         self.stages[name] = stage
+
+    def fit_transform(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None,
+                      save_format=None, save_only_feature=False, cache=False):
+        if not self.fit_transformed:
+            return super().fit_transform(x_like, save_dir, n_jobs, save_format, save_only_feature, cache)
+
+        for i, (name, stage) in enumerate(self.stages.items()):
+            stage_save_path = self._to_stage_savepath(name, save_dir)
+            x_like = stage.fit_transform(x_like, stage_save_path, n_jobs, save_format, save_only_feature, cache)
+        return x_like
 
     def fit(self, x_like: Union[np.ndarray, sparse.spmatrix], save_dir: Path = None, n_jobs=None):
         # TODO support fit after transform stage
