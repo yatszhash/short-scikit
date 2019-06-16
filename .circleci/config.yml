@@ -62,10 +62,7 @@ jobs:
             pip install codecov
             pip install nose2
             cd ./tests
-            nose2 --with-coverage --coverage-report html
+            nose2 --with-coverage  --layer-reporter
             pipenv run codecov
-            cp -r ./unit-test-coverage /tmp
-
-      - store_artifacts:
-          path: /tmp/unit-test-coverage
+        
           
