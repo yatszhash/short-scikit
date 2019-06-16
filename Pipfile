@@ -18,7 +18,8 @@ mecab-python-windows = {version = "*",sys_platform = "== 'win32'"}
 mecab-python3 = {version = "*",markers = "sys_platform == 'linux' or sys_platform == 'darwin'"}
 janome = "*"
 pywavelets = "*"
-
+coverage = "*"
+codecov = "*"
 
 [requires]
 python_version = "3.7"

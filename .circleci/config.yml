@@ -62,6 +62,7 @@ jobs:
             pip install nose2
             cd ./tests
             nose2 --with-coverage --coverage-report html
+            pipenv run codecov
             cp -r ./unit-test-coverage /tmp
 
       - store_artifacts:
