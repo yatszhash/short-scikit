@@ -54,3 +54,14 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
+
+      - run:
+          name: run unit tests
+          command: |
+            . venv/bin/activate
+            pip install codecov
+            pip install nose2
+            nose2 --with-coverage  --plugin=nose2.plugins.layers
+            codecov
+        
+          
