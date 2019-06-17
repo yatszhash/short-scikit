@@ -61,7 +61,6 @@ jobs:
             . venv/bin/activate
             pip install codecov
             pip install nose2
-            cd ./tests
             nose2 --with-coverage  --plugin=nose2.plugins.layers
             codecov
         
