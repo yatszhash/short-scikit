@@ -12,4 +12,4 @@ omit =
     venv/*
     tests/*
     setup.py
-    tests/pipeline/__init__.py
+    shortscikit/pipeline/__init__.py
