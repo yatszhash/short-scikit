@@ -10,6 +10,6 @@ exclude_lines =
 ignore_errors = True
 omit =
     venv/*
-    shortscikit/*
+    tests/*
     setup.py
-    tests/pipeline/__init__.py
+    shortscikit/pipeline/__init__.py
