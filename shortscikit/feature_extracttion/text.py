@@ -1,8 +1,6 @@
 import logging
-import os
 from collections import OrderedDict
 
-import fastText
 import numpy as np
 from gensim.models import KeyedVectors
 from scipy import sparse
