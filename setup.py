@@ -6,8 +6,8 @@ mecab_package = "mecab-python-windows" if sys.platform == "win32" else "mecab-py
 optional_requires = ["pyarrow",
                      mecab_package,
                      "janome",
-                     # "fasttext==0.8.22",
-                     "fastText @ git+https://github.com/facebookresearch/fastText.git",
+                     "fasttext",
+                     # "fastText @ git+https://github.com/facebookresearch/fastText.git",
                      "pywavelets"
                      ]
 

@@ -13,13 +13,15 @@ gensim = "*"
 [dev-packages]
 nose2 = "*"
 pyarrow = "*"
-fasttext = {git = "https://github.com/facebookresearch/fastText.git"}
+#fasttext = {git = "https://github.com/facebookresearch/fastText.git"}
+fasttext = "*"
 mecab-python-windows = {version = "*",sys_platform = "== 'win32'"}
 mecab-python3 = {version = "*",markers = "sys_platform == 'linux' or sys_platform == 'darwin'"}
 janome = "*"
 pywavelets = "*"
 coverage = "*"
 codecov = "*"
+twine = "*"
 
 [requires]
 python_version = "3.7"
