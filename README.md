@@ -14,14 +14,14 @@ This project is under construction and the interfaces and the modules are subjec
 
 The checked features have been implemented.
 
-- [ ] save and load for intermediate data
-- [ ] generator support
-- [ ] dataframe support
+- [x] save and load for intermediate data
+- [x] generator support
+- [x] dataframe support
 - [ ] dask support
-- [ ] batch adaptation of transformations
-- [ ] baranchable pipeline
+- [x] batch adaptation of transformations
+- [ ] branchable pipeline
 - [ ] delayed evaluation
-- [ ] prepared transformers and estimators (inherit sklearn's base classes) for frequent used pre-processing and feature
+- [x] prepared transformers and estimators (inherit sklearn's base classes) for frequent used pre-processing and feature
       extractions
 
 ##  How to develop

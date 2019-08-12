@@ -14,7 +14,7 @@ optional_requires = ["pyarrow",
 setup(
     name='shortscikit',
     version='0.0.1',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(exclude=['tests', '.circleci']),
     install_requires=[
         "numpy",
         "scipy",
@@ -35,7 +35,8 @@ setup(
     license='MIT',
     author='yatszhash',
     author_email='=yatszhash@users.noreply.github.com',
-    description='',
+    description='short-circuit to pre-processing and feature extraction with scikit-learn by reducing to write boiler '
+                'codes',
     test_suite='nose2.collector.collector',
     classifiers=[
         "Development Status :: 1 - Planning",
